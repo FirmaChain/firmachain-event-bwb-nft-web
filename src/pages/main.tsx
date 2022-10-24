@@ -21,10 +21,13 @@ const Main = ({ setLoading }: IProps) => {
     image: { url: string; file: string };
     name: string;
     description: string;
+    dappNftId: string;
   }>({
     image: { url: '', file: '' },
-    name: 'TEST NFT NAME',
-    description: 'MY FIRST NFT! MY FIRST NFT! MY FIRST NFT! MY FIRST NFT! MY FIRST NFT ! MY FIRST NFT',
+    name: '',
+    description:
+      'My first ever NFT to be issued! Visit FIRMACHAIN at the BWB(Blockchain Week in Busan) 2022 event to issue your NFT. All NFTs issued by the My first NFT! service can be checked at the FIRMA NFT!',
+    dappNftId: '',
   });
 
   const handleErrorSnackbar = (status: number) => {
@@ -85,6 +88,7 @@ const Main = ({ setLoading }: IProps) => {
             address={address}
             setLoading={setLoading}
             nftInfo={nftInfo}
+            setNftInfo={setNftInfo}
           />
           <Step4 isActive={currentStep === 3} nftInfo={nftInfo} />
         </ContentsContainer>

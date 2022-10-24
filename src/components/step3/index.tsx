@@ -1,26 +1,31 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import axios from 'axios';
 
+import { useScrollWithShadow } from './hook';
+import { useInterval } from '../../utils/interval';
+import { createTextEllipsis } from '../../utils/common';
+
 import {
-  ButtonWrapper,
+  FixedButtonWrapper,
   Step3Wrapper,
-  CollectionLabel,
+  StepBar,
   NftImage2,
-  AppIcon,
-  CollectionTypo,
   DescriptionWrapper,
+  DescriptionWrapperMin,
   Description,
+  DescriptionRow,
   DescriptionLabel,
   DescriptionTypo,
-  DescriptionTypo2,
+  DescriptionTypoOpener,
+  ScrollWrapper,
   DescIcon,
   Typo,
   SubTypo,
   Divider,
   NextButton,
+  TopWrapper,
+  ArrowButton,
 } from '../../styles';
-import { useInterval } from '../../utils/interval';
-import { createTextEllipsis } from '../../utils/common';
 
 interface IProps {
   isActive: boolean;
@@ -28,12 +33,25 @@ interface IProps {
   setStep: (step: number) => void;
   setLoading: (isLoading: boolean) => void;
   handleErrorSnackbar: (status: number) => void;
-  nftInfo: { image: { url: string; file: string }; name: string; description: string };
+  nftInfo: { image: { url: string; file: string }; name: string; description: string; dappNftId: string };
+  setNftInfo: React.Dispatch<
+    React.SetStateAction<{
+      image: { url: string; file: string };
+      name: string;
+      description: string;
+      dappNftId: string;
+    }>
+  >;
 }
 
-const Step3 = ({ isActive, address, setStep, setLoading, handleErrorSnackbar, nftInfo }: IProps) => {
+const Step3 = ({ isActive, address, setStep, setLoading, handleErrorSnackbar, nftInfo, setNftInfo }: IProps) => {
   const [requestKey, setRequestKey] = useState('');
   const [isTickerActive, setIsTickerActive] = useState(false);
+  const [isOpen, setOpen] = useState(false);
+
+  const scrollWrapperRef = useRef<any>(null);
+
+  const { boxShadow, onScrollHandler } = useScrollWithShadow({ isOpen });
 
   useInterval(() => timerTick(), isActive && isTickerActive ? 1000 : null);
 
@@ -60,6 +78,10 @@ const Step3 = ({ isActive, address, setStep, setLoading, handleErrorSnackbar, nf
         .then((result) => {
           console.log(result);
           if (result.status === 1) {
+            setNftInfo((prevState) => ({
+              ...prevState,
+              dappNftId: result.extra,
+            }));
             setIsTickerActive(false);
             setLoading(false);
             setStep(3);
@@ -106,59 +128,54 @@ const Step3 = ({ isActive, address, setStep, setLoading, handleErrorSnackbar, nf
 
   return (
     <Step3Wrapper>
-      <CollectionLabel>
-        <AppIcon src='/images/bwb_icon.png' />
-        <CollectionTypo>My First NFT!</CollectionTypo>
-      </CollectionLabel>
-      <NftImage2 src={nftInfo.image.url} />
-      <DescriptionWrapper>
-        <Description>
-          <DescriptionLabel>Name</DescriptionLabel>
-          <DescriptionTypo>{nftInfo.name}</DescriptionTypo>
-        </Description>
-        <Description>
-          <DescriptionLabel>Description</DescriptionLabel>
-          <DescriptionTypo>{nftInfo.description}</DescriptionTypo>
-        </Description>
-      </DescriptionWrapper>
-      <Divider />
-      <DescriptionWrapper>
-        <Description>
-          <DescriptionLabel>Chain</DescriptionLabel>
-          <DescriptionTypo>
-            <DescIcon src='/images/bwb_icon.png' />
-            <Typo>FIRMACHAIN</Typo>
-            <SubTypo>(colosseum-1)</SubTypo>
-          </DescriptionTypo>
-        </Description>
-        <Description>
-          <DescriptionLabel>Collection</DescriptionLabel>
-          <DescriptionTypo>
-            <DescIcon src='/images/bwb_icon.png' />
-            <Typo>My First NFT!</Typo>
-          </DescriptionTypo>
-        </Description>
-        <Description>
-          <DescriptionLabel>Created By</DescriptionLabel>
-          <DescriptionTypo>
-            <DescIcon src='/images/bwb_icon.png' />
-            <Typo> {createTextEllipsis(address, 10, 10)}</Typo>
-          </DescriptionTypo>
-        </Description>
-      </DescriptionWrapper>
-      <Divider />
-      <DescriptionWrapper>
-        <Description>
-          <DescriptionLabel>Fee</DescriptionLabel>
-          <DescriptionTypo2>0.02 FCT</DescriptionTypo2>
-        </Description>
-      </DescriptionWrapper>
-      <ButtonWrapper>
-        <NextButton isActive={false}>CANCEL</NextButton>
+      <TopWrapper>
+        <StepBar src='/images/img_step_3.png' />
+        <NftImage2 src={nftInfo.image.url} />
+      </TopWrapper>
+      <ScrollWrapper ref={scrollWrapperRef} onScroll={onScrollHandler} style={{ boxShadow }}>
+        <DescriptionWrapper>
+          <Description>
+            <DescriptionLabel>Name</DescriptionLabel>
+            <DescriptionTypo>{nftInfo.name}</DescriptionTypo>
+          </Description>
+          <Description>
+            <ArrowButton isOpen={isOpen} onClick={() => setOpen(!isOpen)} />
+            <DescriptionLabel>Description</DescriptionLabel>
+            <DescriptionTypoOpener isOpen={isOpen}>{nftInfo.description}</DescriptionTypoOpener>
+          </Description>
+        </DescriptionWrapper>
+        <Divider />
+        <DescriptionWrapperMin>
+          <DescriptionRow>
+            <DescriptionLabel>Blockchain</DescriptionLabel>
+            <DescriptionTypo style={{ justifyContent: 'flex-end' }}>
+              <DescIcon src='/images/denom_firma.jpg' />
+              <Typo>FIRMACHAIN</Typo>
+              <SubTypo>(colosseum-1)</SubTypo>
+            </DescriptionTypo>
+          </DescriptionRow>
+          <DescriptionRow>
+            <DescriptionLabel>Collection</DescriptionLabel>
+            <DescriptionTypo style={{ justifyContent: 'flex-end' }}>
+              <DescIcon src='/images/myfirstnft.png' />
+              <Typo>My First NFT!</Typo>
+            </DescriptionTypo>
+          </DescriptionRow>
+          <DescriptionRow>
+            <DescriptionLabel>Created By</DescriptionLabel>
+            <DescriptionTypo style={{ justifyContent: 'flex-end' }}>
+              <DescIcon src='/images/ic_profile.png' style={{ filter: 'brightness(65%) grayscale(100%)' }} />
+              <Typo> {createTextEllipsis(address, 10, 10)}</Typo>
+            </DescriptionTypo>
+          </DescriptionRow>
+        </DescriptionWrapperMin>
+      </ScrollWrapper>
+      <FixedButtonWrapper>
+        <NextButton isActive={false}>Cancel</NextButton>
         <NextButton isActive={true} onClick={() => onClickMint()}>
-          MINT
+          Mint
         </NextButton>
-      </ButtonWrapper>
+      </FixedButtonWrapper>
     </Step3Wrapper>
   );
 };

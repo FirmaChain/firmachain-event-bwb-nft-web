@@ -22,14 +22,14 @@ export const ModalOverlay = styled.div<{ visible: boolean; transparent: boolean 
   left: 0;
   bottom: 0;
   right: 0;
-  ${(props) => (props.transparent ? 'background-color: #1c1c24;' : 'background-color: rgba(0, 0, 0, 0.5);')}
+  ${(props) => (props.transparent ? 'background-color: #000;' : 'background-color: rgba(0, 0, 0, 0.5);')}
   z-index: 999;
 `;
 
 export const ModalInner = styled.div<{ width: string; transparent: boolean }>`
   box-sizing: border-box;
   position: relative;
-  ${(props) => props.transparent === false && `box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);background-color: #292932;`}
+  ${(props) => props.transparent === false && `box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);background-color: #000;`}
   border-radius: 12px;
   width: ${(props) => (props.width ? props.width : '300px')};
   max-width: 500px;
@@ -37,6 +37,5 @@ export const ModalInner = styled.div<{ width: string; transparent: boolean }>`
   top: 50%;
   transform: translateY(-50%);
   margin: 0 auto;
-  padding: 30px 10px;
   color: white;
 `;

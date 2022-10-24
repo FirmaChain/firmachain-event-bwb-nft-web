@@ -1,20 +1,17 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
 import Cropper from 'react-easy-crop';
 
 import Modal from './modal';
 
-import { SmallButton } from '../../styles';
-
 export const ModalContainerFixed = styled.div`
-  width: 100%;
-  height: 85vh;
+  width: calc(100%);
+  height: 90vh;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
   font-size: 1.8rem;
-  gap: 2rem;
 `;
 
 export const Box = styled.div`
@@ -33,13 +30,6 @@ export const ModalTitle = styled.div`
   color: #eee;
 `;
 
-export const ImageInput = styled.input`
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: none;
-`;
-
 export const ZoomInput = styled.input`
   width: 100%;
   margin: 2rem;
@@ -49,7 +39,6 @@ export const CropperContainer = styled.div`
   position: relative;
   width: 100%;
   flex: 1 100%;
-  border: 1px solid #777;
   border-radius: 4px;
 `;
 
@@ -77,54 +66,54 @@ export const ChooseIcon = styled.img`
   filter: brightness(0) invert(1);
 `;
 
-export const SmallButtonWrapper = styled.div`
+export const ModalBottomWrapper = styled.div`
+  position: absolute;
+  bottom: 0;
   width: 100%;
+  height: 8rem;
   display: flex;
-  gap: 1.5rem;
+  justify-content: center;
+  align-items: center;
+  background-color: #00000088;
+`;
+
+export const CloseMiniButton = styled.div<{ src: string }>`
+  width: 2.4rem;
+  height: 2.4rem;
+  background-image: url('${(props) => props.src}');
+`;
+
+export const BottomTypo = styled.div`
+  width: 75%;
+  text-align: center;
+  font-size: 2rem;
 `;
 
 interface IProps {
-  visible: boolean;
-  onClose: () => void;
+  imageSrc: string;
+  setImageSrc: (src: string | null) => void;
   setNftInfo: React.Dispatch<
     React.SetStateAction<{
       image: { url: string; file: string };
       name: string;
       description: string;
+      dappNftId: string;
     }>
   >;
 }
 
-const ModalImageCropper = ({ visible, onClose, setNftInfo }: IProps) => {
-  const [imageSrc, setImageSrc] = React.useState<any>(null);
+const ModalImageCropper = ({ imageSrc, setImageSrc, setNftInfo }: IProps) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-  const imageInputRef = useRef<any>(null);
+
+  const onClose = () => {
+    setImageSrc(null);
+  };
 
   const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
     setCroppedAreaPixels(croppedAreaPixels);
   }, []);
-
-  const onFileChange = async (e: any) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      let imageDataUrl = await readFile(file);
-      setImageSrc(imageDataUrl);
-    }
-  };
-
-  const readFile = async (file: any) => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.addEventListener('load', () => resolve(reader.result), false);
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const onClickImageInput = () => {
-    imageInputRef.current.click();
-  };
 
   const cropped = () => {
     getCroppedImg(imageSrc, croppedAreaPixels)
@@ -210,44 +199,27 @@ const ModalImageCropper = ({ visible, onClose, setNftInfo }: IProps) => {
   };
 
   return (
-    <Modal onClose={onClose} visible={visible} width={'100%'} maskClosable={true} transparent={true}>
+    <Modal onClose={onClose} transparent={true} visible={imageSrc !== null} width={'100%'} maskClosable={true}>
       <ModalContainerFixed>
-        <ModalTitle>Image Upload</ModalTitle>
-        <ImageInput ref={imageInputRef} type={'file'} onChange={onFileChange} accept='image/*' />
         <CropperContainer>
-          {imageSrc === null && (
-            <ChooseImageInput onClick={onClickImageInput}>
-              <ChooseIcon src='/images/upload.png' />
-              <ChooseTypo>Choose Nft Image</ChooseTypo>
-            </ChooseImageInput>
-          )}
-          {imageSrc !== null && (
-            <Cropper
-              image={imageSrc}
-              crop={crop}
-              zoom={zoom}
-              aspect={1}
-              restrictPosition={true}
-              objectFit='horizontal-cover'
-              onCropChange={setCrop}
-              onCropComplete={onCropComplete}
-              onZoomChange={setZoom}
-            />
-          )}
+          <Cropper
+            image={imageSrc}
+            crop={crop}
+            zoom={zoom}
+            aspect={1}
+            restrictPosition={true}
+            objectFit='horizontal-cover'
+            onCropChange={setCrop}
+            onCropComplete={onCropComplete}
+            onZoomChange={setZoom}
+          />
         </CropperContainer>
-
-        <SmallButtonWrapper>
-          <SmallButton isActive={false} onClick={() => onClose()}>
-            CLOSE
-          </SmallButton>
-          <SmallButton isActive={false} onClick={() => setImageSrc(null)}>
-            RESET
-          </SmallButton>
-          <SmallButton isActive={true} onClick={() => cropped()}>
-            OK
-          </SmallButton>
-        </SmallButtonWrapper>
       </ModalContainerFixed>
+      <ModalBottomWrapper>
+        <CloseMiniButton src='/images/ic_close_24px.png' onClick={() => onClose()} />
+        <BottomTypo>Image Crop</BottomTypo>
+        <CloseMiniButton src='/images/ic_check_bl_24px.png' onClick={() => cropped()} />
+      </ModalBottomWrapper>
     </Modal>
   );
 };

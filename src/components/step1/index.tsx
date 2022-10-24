@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 import { useInterval } from '../../utils/interval';
-import { Logo, TitleText, SubText, ButtonWrapper, Button, Step1Wrapper } from '../../styles';
+import { Logo, ButtonWrapper, Button, Step1Wrapper } from '../../styles';
 
 interface IProps {
   isActive: boolean;
@@ -80,12 +80,10 @@ const Step1 = ({ isActive, setStep, setLoading, setAddress, handleErrorSnackbar 
 
   return (
     <Step1Wrapper>
-      <Logo />
-      <TitleText>My First NFT!</TitleText>
-      <SubText style={{ marginTop: '1.4rem' }}>BWB 2022</SubText>
+      <Logo src='/images/img_title.png' />
       <ButtonWrapper>
         <Button style={{ borderRadius: '0.4rem' }} isActive={true} onClick={onClickConnect}>
-          CONNECT
+          Connect
         </Button>
       </ButtonWrapper>
     </Step1Wrapper>
