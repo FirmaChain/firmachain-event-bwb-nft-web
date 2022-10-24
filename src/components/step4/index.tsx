@@ -44,7 +44,7 @@ const Step4 = ({ isActive, nftInfo }: IProps) => {
         window.ReactNativeWebView.postMessage('close');
       }, 5000);
     }
-  }, [isActive]);
+  }, [isActive]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Step4Wrapper>
