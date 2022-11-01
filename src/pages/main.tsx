@@ -44,7 +44,7 @@ const Main = ({ setLoading }: IProps) => {
         message = 'Failed to get token information';
         break;
       default:
-        message = 'Connection with wallet failed.';
+        message = 'The mint event has officially ended.';
         break;
     }
 

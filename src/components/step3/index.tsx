@@ -76,7 +76,6 @@ const Step3 = ({ isActive, address, setStep, setLoading, handleErrorSnackbar, nf
     if (requestKey !== '') {
       getRequestStatus(requestKey)
         .then((result) => {
-          console.log(result);
           if (result.status === 1) {
             setNftInfo((prevState) => ({
               ...prevState,
